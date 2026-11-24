@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
 using AutoKey.Platform;
 using AutoKey.Services;
@@ -13,6 +14,7 @@ public partial class MainWindow : Window
     private readonly IPlatform _platform;
     private readonly MainViewModel _viewModel;
     private OverlayWindow? _overlay;
+    private AboutWindow? _about;
 
     internal MainWindow(IPlatform platform)
     {
@@ -29,19 +31,36 @@ public partial class MainWindow : Window
         Activated += (_, _) => _viewModel.RefreshNotice(); // e.g. after granting a permission in System Settings
     }
 
-    /// <summary>Raised when closing the window only hid it; the app then shows a tray icon to bring it back.</summary>
-    internal event EventHandler? HiddenToTray;
+    /// <summary>
+    /// Shows the window in front of other windows, for the tray icon: brings it back if it was closed to the tray, and
+    /// restores it if it's minimized.
+    /// </summary>
+    internal void ShowFromTray() => BringToFront(this);
 
-    /// <summary>Shows the window again after it was hidden to the tray, in front of other windows.</summary>
-    internal void ShowFromTray()
+    /// <summary>Shows the About window in front of other windows, opening it if it isn't open yet.</summary>
+    internal void ShowAbout()
     {
-        Show();
-        if (WindowState == WindowState.Minimized)
+        if (_about is null)
         {
-            WindowState = WindowState.Normal; // it was closed from the taskbar while minimized
+            _about = new AboutWindow();
+            _platform.TrackWindow(_about);
+            _about.Closed += (_, _) => _about = null;
         }
 
-        Activate();
+        BringToFront(_about);
+    }
+
+    private void OnAboutClick(object? sender, RoutedEventArgs e) => ShowAbout();
+
+    private static void BringToFront(Window window)
+    {
+        window.Show();
+        if (window.WindowState == WindowState.Minimized)
+        {
+            window.WindowState = WindowState.Normal; // e.g. the main window was closed from the taskbar while minimized
+        }
+
+        window.Activate();
     }
 
     protected override void OnClosing(WindowClosingEventArgs e)
@@ -59,7 +78,6 @@ public partial class MainWindow : Window
         e.Cancel = true;
         _viewModel.SaveSettings(); // AutoKey may now stay in the tray for a long time
         Hide();
-        HiddenToTray?.Invoke(this, EventArgs.Empty);
     }
 
     private void OnOpened(object? sender, EventArgs e)
@@ -88,6 +106,7 @@ public partial class MainWindow : Window
         _platform.Hotkeys.Unregister(HotkeyAction.Stop);
         _viewModel.Dispose(); // stops any typing (releasing held keys) and saves settings
         _overlay?.Close();
+        _about?.Close();
         base.OnClosed(e);
     }
 

@@ -26,37 +26,32 @@ public partial class App : Application
     }
 
     /// <summary>
-    /// The tray icon (in the menu bar on macOS) that appears while the main window is hidden. Clicking it, or Show
-    /// AutoKey in its menu, brings the window back; Quit AutoKey in the menu ends the app.
+    /// The tray icon (in the menu bar on macOS), shown for as long as AutoKey runs. Clicking it, or Open in its menu,
+    /// brings the window to the front, and back if it was closed to the tray; About in the menu opens the About
+    /// window, and Exit ends the app. On Windows the menu is drawn by Avalonia, so App.axaml styles it; macOS and
+    /// Linux show it as a native menu.
     /// </summary>
     private void AddTrayIcon(IClassicDesktopStyleApplicationLifetime desktop, MainWindow window)
     {
-        var showItem = new NativeMenuItem("Show AutoKey");
-        var quitItem = new NativeMenuItem("Quit AutoKey");
+        var showItem = new NativeMenuItem("Open");
+        var aboutItem = new NativeMenuItem("About");
+        var quitItem = new NativeMenuItem("Exit");
         var trayIcon = new TrayIcon
         {
             Icon = window.Icon,
             ToolTipText = "AutoKey",
-            IsVisible = false,
-            Menu = new NativeMenu { showItem, new NativeMenuItemSeparator(), quitItem },
+            Menu = new NativeMenu { showItem, new NativeMenuItemSeparator(), aboutItem, quitItem },
         };
 
         // Avalonia only creates the icon once it belongs to the application (and removes it when the app exits).
         TrayIcon.SetIcons(this, new TrayIcons { trayIcon });
 
-        window.HiddenToTray += (_, _) => trayIcon.IsVisible = true;
-
-        void ShowWindow()
-        {
-            trayIcon.IsVisible = false;
-            window.ShowFromTray();
-        }
-
         // Each action is queued on the UI thread: Linux reports tray clicks from D-Bus, and a menu item shouldn't
         // close the app or open a window in the middle of the menu's own click handling. On macOS a click on the
-        // icon opens the menu rather than raising Clicked, hence Show AutoKey.
-        trayIcon.Clicked += (_, _) => Dispatcher.UIThread.Post(ShowWindow);
-        showItem.Click += (_, _) => Dispatcher.UIThread.Post(ShowWindow);
+        // icon opens the menu rather than raising Clicked, hence Open.
+        trayIcon.Clicked += (_, _) => Dispatcher.UIThread.Post(window.ShowFromTray);
+        showItem.Click += (_, _) => Dispatcher.UIThread.Post(window.ShowFromTray);
+        aboutItem.Click += (_, _) => Dispatcher.UIThread.Post(window.ShowAbout);
         quitItem.Click += (_, _) => Dispatcher.UIThread.Post(() => desktop.Shutdown());
 
         // macOS: clicking AutoKey in the Dock brings the window back too.
@@ -66,7 +61,7 @@ public partial class App : Application
             {
                 if (e.Kind == ActivationKind.Reopen)
                 {
-                    Dispatcher.UIThread.Post(ShowWindow);
+                    Dispatcher.UIThread.Post(window.ShowFromTray);
                 }
             };
         }

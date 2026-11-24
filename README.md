@@ -62,9 +62,11 @@ or build the packages yourself (see [Building](#building)). Each one runs on its
 | Start / pause / resume | **F8** | **⌃⌥P** (Control-Option-P; F8 is the media key on Mac keyboards) |
 | Stop | **Esc** | **Esc** |
 
-Closing the window doesn't quit AutoKey: it keeps running in the system tray (the menu bar on macOS), the hotkeys
-keep working, and typing that's under way carries on. Click the tray icon, or choose **Show AutoKey** from its menu,
-to bring the window back (on macOS, clicking AutoKey in the Dock works too); choose **Quit AutoKey** to exit.
+While AutoKey runs, its icon sits in the system tray (the menu bar on macOS). Closing the window doesn't quit
+AutoKey: it keeps running there, the hotkeys keep working, and typing that's under way carries on. Click the tray
+icon, or choose **Open** from its menu, to bring the window back or to the front (on macOS, clicking AutoKey in the
+Dock works too); choose **About** to see which version you have (the **ⓘ** button at the top right of the window
+opens it too), and **Exit** to quit.
 Windows may put a new tray icon under the **^** (Show hidden icons) arrow at first; drag it onto the taskbar to keep
 it in view.
 
@@ -120,7 +122,7 @@ dotnet run --project src/AutoKey  # start the app
 
 dotnet run build/package.cs                           # packages for every platform, in ./artifacts
 dotnet run build/package.cs -- osx-arm64 linux-x64    # only some platforms
-dotnet run build/package.cs -- --version 1.2.0
+dotnet run build/package.cs -- --version 1.0.0
 ```
 
 All packages can be built on any of the three systems, including the macOS `.dmg`: on a Mac the script uses Apple's

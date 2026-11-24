@@ -11,7 +11,7 @@
     <Grid Margin="24,18,24,14" RowDefinitions="Auto,Auto,*,Auto,Auto">
 
         <!-- Header -->
-        <Grid Margin="0,0,0,18" ColumnDefinitions="Auto,*">
+        <Grid Margin="0,0,0,18" ColumnDefinitions="Auto,*,Auto">
             <Image Width="40" Height="40" Margin="0,0,14,0" VerticalAlignment="Center"
                    RenderOptions.BitmapInterpolationMode="HighQuality" Source="/Assets/AutoKey.png" />
             <StackPanel Grid.Column="1" VerticalAlignment="Center">
@@ -19,6 +19,11 @@
                 <TextBlock Classes="secondary" FontSize="13"
                            Text="Types your text into any window the way a person would: uneven rhythm, natural pauses, and typos that get noticed and fixed." />
             </StackPanel>
+            <Button Grid.Column="2" Width="36" Height="32" Margin="16,0,0,0" Padding="0" VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                    ToolTip.Tip="About AutoKey" AutomationProperties.Name="About AutoKey" Click="OnAboutClick">
+                <PathIcon Width="16" Height="16" Data="{StaticResource InfoIcon}" />
+            </Button>
         </Grid>
 
         <!-- Something on this computer limits what AutoKey can do (a missing permission, Wayland, …) -->

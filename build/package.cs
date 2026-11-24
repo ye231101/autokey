@@ -7,7 +7,7 @@
 //
 //   dotnet run build/package.cs                              all platforms
 //   dotnet run build/package.cs -- osx-arm64 linux-x64       selected runtimes
-//   dotnet run build/package.cs -- --version 1.2.0
+//   dotnet run build/package.cs -- --version 1.0.0
 //
 // Output:
 //   AutoKey-<version>-win-x64.exe          single self-contained executable
@@ -30,7 +30,7 @@ const UnixFileMode Executable = UnixFileMode.UserRead | UnixFileMode.UserWrite |
 const UnixFileMode Regular = UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.GroupRead | UnixFileMode.OtherRead;
 
 string root = FindRepositoryRoot();
-string version = "1.0.0";
+string version = "1.0.1";
 var runtimes = new List<string>();
 for (int i = 0; i < args.Length; i++)
 {

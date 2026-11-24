@@ -1,0 +1,46 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="AutoKey.AboutWindow"
+        Title="About AutoKey"
+        Icon="/Assets/AutoKey.ico"
+        CanResize="False" SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource AppBackground}">
+    <StackPanel Width="400" Margin="24,22,24,20">
+
+        <!-- Header, as in the main window -->
+        <Grid ColumnDefinitions="Auto,*">
+            <Image Width="64" Height="64" Margin="0,0,16,0" VerticalAlignment="Center"
+                   RenderOptions.BitmapInterpolationMode="HighQuality" Source="/Assets/AutoKey.png" />
+            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <TextBlock Classes="title" Text="AutoKey" />
+                <TextBlock x:Name="VersionText" Classes="secondary" FontSize="13" />
+            </StackPanel>
+        </Grid>
+
+        <Border Margin="0,18,0,0" Classes="card">
+            <StackPanel Spacing="16">
+                <TextBlock TextWrapping="Wrap"
+                           Text="Types your text into any window the way a person would: uneven rhythm, natural pauses, and typos that get noticed and fixed." />
+
+                <!-- Asking for a star on GitHub -->
+                <Grid ColumnDefinitions="Auto,*">
+                    <PathIcon Width="16" Height="16" Margin="0,2,10,0" VerticalAlignment="Top"
+                              Foreground="{DynamicResource StarFill}" Data="{StaticResource StarIcon}" />
+                    <StackPanel Grid.Column="1" Spacing="8">
+                        <TextBlock TextWrapping="Wrap">
+                            <Run FontWeight="SemiBold" Text="Enjoying AutoKey?" />
+                            <Run Text="Please give it a star on GitHub. It helps other people find it." />
+                        </TextBlock>
+                        <!-- The negative margin lines the link's text up with the text above it. -->
+                        <HyperlinkButton Margin="-4,-2" Padding="4,2" NavigateUri="https://github.com/ye231101/autokey"
+                                         Content="github.com/ye231101/autokey" ToolTip.Tip="Open AutoKey on GitHub" />
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <Button Margin="0,18,0,0" MinWidth="104" HorizontalAlignment="Right" HorizontalContentAlignment="Center" Classes="accent"
+                IsDefault="True" IsCancel="True" Content="OK" Click="OnOkClick" />
+    </StackPanel>
+</Window>

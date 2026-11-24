@@ -14,7 +14,7 @@
     The build stops at the first failure. The script can be started from any directory.
 
 .PARAMETER Version
-    Version for the packages, for example 1.2.0. Defaults to the version in build\package.cs.
+    Version for the packages, for example 1.0.0. Defaults to the version in build\package.cs.
 
 .PARAMETER Runtime
     Build only these runtimes, for example win-x64,linux-x64. Defaults to all of them.
@@ -26,7 +26,7 @@
     .\build.ps1
 
 .EXAMPLE
-    .\build.ps1 -Version 1.2.0
+    .\build.ps1 -Version 1.0.0
 
 .EXAMPLE
     .\build.ps1 -Runtime win-x64,osx-arm64 -SkipTests
