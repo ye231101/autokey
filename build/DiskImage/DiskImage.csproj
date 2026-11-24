@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Writes macOS disk images (.dmg) without a Mac; used by build/package.cs. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>AutoKey.Build.DiskImage</RootNamespace>
+  </PropertyGroup>
+
+</Project>

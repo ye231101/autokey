@@ -1,0 +1,201 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AutoKey.ViewModels"
+        x:Class="AutoKey.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="AutoKey"
+        Icon="/Assets/AutoKey.ico"
+        Width="1040" Height="800" MinWidth="820" MinHeight="600"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource AppBackground}">
+    <Grid Margin="24,18,24,14" RowDefinitions="Auto,Auto,*,Auto,Auto">
+
+        <!-- Header -->
+        <Grid Margin="0,0,0,18" ColumnDefinitions="Auto,*">
+            <Image Width="40" Height="40" Margin="0,0,14,0" VerticalAlignment="Center"
+                   RenderOptions.BitmapInterpolationMode="HighQuality" Source="/Assets/AutoKey.png" />
+            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <TextBlock Classes="title" Text="AutoKey" />
+                <TextBlock Classes="secondary" FontSize="13"
+                           Text="Types your text into any window the way a person would: uneven rhythm, natural pauses, and typos that get noticed and fixed." />
+            </StackPanel>
+        </Grid>
+
+        <!-- Something on this computer limits what AutoKey can do (a missing permission, Wayland, …) -->
+        <Border Grid.Row="1" Margin="0,0,0,16" Classes="notice" IsVisible="{Binding HasNotice}">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="2">
+                    <TextBlock Classes="strong" Text="{Binding NoticeTitle}" />
+                    <TextBlock Classes="secondary" Text="{Binding NoticeMessage}" />
+                </StackPanel>
+                <Button Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center"
+                        Content="{Binding NoticeActionLabel}" Command="{Binding NoticeActionCommand}"
+                        IsVisible="{Binding HasNoticeAction}" />
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*,16,340">
+
+            <!-- Text to type -->
+            <Border Classes="card">
+                <Grid RowDefinitions="Auto,*,Auto">
+                    <DockPanel LastChildFill="False">
+                        <TextBlock DockPanel.Dock="Left" VerticalAlignment="Center" Classes="strong" Text="Text to type" />
+                        <Button DockPanel.Dock="Right" Margin="8,0,0,0" Command="{Binding ClearCommand}"
+                                ToolTip.Tip="Clear the text" AutomationProperties.Name="Clear">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <PathIcon Width="12" Height="12" Data="{StaticResource ClearIcon}" />
+                                <TextBlock Text="Clear" />
+                            </StackPanel>
+                        </Button>
+                        <Button DockPanel.Dock="Right" Command="{Binding PasteCommand}"
+                                ToolTip.Tip="Replace the text with what's on the clipboard" AutomationProperties.Name="Paste">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <PathIcon Width="14" Height="14" Data="{StaticResource PasteIcon}" />
+                                <TextBlock Text="Paste" />
+                            </StackPanel>
+                        </Button>
+                    </DockPanel>
+
+                    <TextBox x:Name="InputBox" Grid.Row="1" Margin="0,12,0,10"
+                             AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap" FontSize="14"
+                             VerticalContentAlignment="Top" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                             PlaceholderText="Type or paste the text you want AutoKey to type for you…"
+                             AutomationProperties.Name="Text to type"
+                             IsReadOnly="{Binding IsSessionActive}"
+                             Text="{Binding Text}" />
+
+                    <TextBlock Grid.Row="2" Classes="secondary" Text="{Binding TextSummary}" />
+                </Grid>
+            </Border>
+
+            <!-- Typing style -->
+            <Border Grid.Column="2" Classes="card" Padding="0">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="18,16,18,18" IsEnabled="{Binding CanEditSettings}">
+                        <TextBlock Classes="strong" Text="Typing style" />
+
+                        <Grid Classes="setting" ColumnDefinitions="*,Auto">
+                            <TextBlock Text="Speed" />
+                            <TextBlock Grid.Column="1" Classes="value" Text="{Binding SpeedLabel}" />
+                        </Grid>
+                        <Slider AutomationProperties.Name="Typing speed in words per minute"
+                                Minimum="10" Maximum="200" SmallChange="1" LargeChange="10" TickFrequency="1" IsSnapToTickEnabled="True"
+                                Value="{Binding WordsPerMinute}" />
+                        <TextBlock Classes="secondary" Text="{Binding SpeedHint}" />
+
+                        <Grid Classes="setting" ColumnDefinitions="*,Auto">
+                            <TextBlock Text="Rhythm" />
+                            <TextBlock Grid.Column="1" Classes="value" Text="{Binding VariationLabel}" />
+                        </Grid>
+                        <Slider AutomationProperties.Name="Rhythm variation"
+                                Minimum="0" Maximum="100" SmallChange="5" LargeChange="10" TickFrequency="1" IsSnapToTickEnabled="True"
+                                Value="{Binding VariationPercent}" />
+                        <TextBlock Classes="secondary" Text="How uneven the timing between keystrokes is" />
+
+                        <Grid Classes="setting" ColumnDefinitions="*,Auto">
+                            <TextBlock Text="Typos" />
+                            <TextBlock Grid.Column="1" Classes="value" Text="{Binding TypoLabel}" />
+                        </Grid>
+                        <Slider AutomationProperties.Name="Typo frequency"
+                                Minimum="0" Maximum="10" SmallChange="0.5" LargeChange="1" TickFrequency="0.5" IsSnapToTickEnabled="True"
+                                Value="{Binding TypoPercent}" />
+                        <TextBlock Classes="secondary" Text="{Binding TypoHint}" />
+
+                        <Grid Classes="setting" ColumnDefinitions="*,Auto">
+                            <TextBlock Text="Pauses" />
+                            <TextBlock Grid.Column="1" Classes="value" Text="{Binding PauseLabel}" />
+                        </Grid>
+                        <Slider AutomationProperties.Name="Amount of natural pauses"
+                                Minimum="0" Maximum="200" SmallChange="5" LargeChange="20" TickFrequency="5" IsSnapToTickEnabled="True"
+                                Value="{Binding PausePercent}" />
+                        <TextBlock Classes="secondary" Text="After sentences, at line breaks, and to think" />
+
+                        <Grid Classes="setting" ColumnDefinitions="*,Auto">
+                            <TextBlock Text="Start delay" />
+                            <TextBlock Grid.Column="1" Classes="value" Text="{Binding StartDelayLabel}" />
+                        </Grid>
+                        <Slider AutomationProperties.Name="Start delay in seconds"
+                                Minimum="0" Maximum="10" SmallChange="1" LargeChange="1" TickFrequency="1" IsSnapToTickEnabled="True"
+                                Value="{Binding StartDelaySeconds}" />
+                        <TextBlock Classes="secondary" Text="Time to click into the target window after you press Start" />
+
+                        <CheckBox Margin="0,18,0,0" Content="Pause if I switch to another window" IsChecked="{Binding PauseOnFocusLoss}" />
+                        <CheckBox Content="Show a floating status panel" IsChecked="{Binding ShowOverlay}" />
+
+                        <TextBlock Margin="0,22,0,0" Classes="strong" Text="Advanced" />
+                        <StackPanel Margin="0,10,0,0" Spacing="6">
+                            <TextBlock Text="New lines are typed with" />
+                            <ComboBox HorizontalAlignment="Stretch" SelectedIndex="{Binding NewLineKeyIndex}">
+                                <ComboBoxItem Content="Enter" />
+                                <ComboBoxItem Content="Shift+Enter (for chat apps)" />
+                            </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,14,0,0" Spacing="2" IsVisible="{Binding ShowCodeEditorOption}">
+                            <CheckBox Content="Keep text exact in code editors" IsChecked="{Binding KeepCodeEditorTextExact}" />
+                            <TextBlock Classes="secondary"
+                                       Text="Stops VS Code, Cursor and similar editors from autocompleting, auto-indenting or closing brackets. Turn off when typing into their built-in terminal." />
+                        </StackPanel>
+
+                        <StackPanel Margin="0,14,0,0" Spacing="6" IsVisible="{Binding ShowTypingMethod}">
+                            <TextBlock Text="Send characters as" />
+                            <ComboBox HorizontalAlignment="Stretch" SelectedIndex="{Binding TypingMethodIndex}">
+                                <ComboBoxItem Content="Key presses (recommended)" />
+                                <ComboBoxItem Content="Unicode characters" />
+                            </ComboBox>
+                            <TextBlock Classes="secondary"
+                                       Text="Key presses behave like a real keyboard and also work in virtual machines and remote desktops. Switch to Unicode if some characters come out wrong." />
+                        </StackPanel>
+
+                        <Button Margin="0,16,0,0" Content="Restore defaults" Command="{Binding ResetSettingsCommand}" />
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- Status and actions -->
+        <Border Grid.Row="3" Margin="0,16,0,0" Padding="18,14" Classes="card">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Ellipse Margin="0,6,14,0" VerticalAlignment="Top" Classes="status"
+                         Classes.active="{Binding IsStatusActive}" Classes.waiting="{Binding IsStatusWaiting}"
+                         Classes.success="{Binding IsStatusSuccess}" Classes.error="{Binding IsStatusError}" />
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Classes="strong" Text="{Binding StatusTitle}" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Margin="0,2,0,0" Classes="secondary" Text="{Binding StatusDetail}"
+                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+                    <ProgressBar Margin="0,10,0,2" Minimum="0" Maximum="1" Value="{Binding Progress, Mode=OneWay}"
+                                 IsVisible="{Binding IsProgressVisible}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Margin="20,0,0,0" VerticalAlignment="Center" Orientation="Horizontal" Spacing="8">
+                    <Button MinWidth="104" Command="{Binding StopCommand}" IsVisible="{Binding IsSessionActive}"
+                            AutomationProperties.Name="Stop">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <PathIcon Width="12" Height="12" Data="{StaticResource StopIcon}" />
+                            <TextBlock Text="Stop" />
+                        </StackPanel>
+                    </Button>
+                    <Button MinWidth="104" Command="{Binding PauseResumeCommand}" IsVisible="{Binding IsSessionActive}"
+                            AutomationProperties.Name="{Binding PauseButtonText}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <PathIcon Width="12" Height="12" Data="{StaticResource PauseIcon}" IsVisible="{Binding !IsPaused}" />
+                            <PathIcon Width="12" Height="12" Data="{StaticResource PlayIcon}" IsVisible="{Binding IsPaused}" />
+                            <TextBlock Text="{Binding PauseButtonText}" />
+                        </StackPanel>
+                    </Button>
+                    <Button MinWidth="150" Padding="18,9" Classes="accent" Command="{Binding StartCommand}"
+                            IsVisible="{Binding !IsSessionActive}" AutomationProperties.Name="Start typing">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <PathIcon Width="12" Height="12" Data="{StaticResource PlayIcon}" />
+                            <TextBlock Text="Start typing" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <TextBlock Grid.Row="4" Margin="2,10,0,0" Classes="secondary" Text="{Binding HotkeyHint}" />
+    </Grid>
+</Window>

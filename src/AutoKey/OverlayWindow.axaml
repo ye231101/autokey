@@ -1,0 +1,50 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AutoKey.ViewModels"
+        x:Class="AutoKey.OverlayWindow"
+        x:DataType="vm:MainViewModel"
+        Title="AutoKey status"
+        WindowDecorations="None" CanResize="False" SizeToContent="WidthAndHeight"
+        Topmost="True" ShowInTaskbar="False" ShowActivated="False"
+        Background="Transparent" TransparencyLevelHint="Transparent"
+        WindowStartupLocation="Manual">
+
+    <!-- The outer margin leaves room for the shadow. Drag anywhere to move the panel. -->
+    <Border Margin="14" Padding="14,12,12,12" CornerRadius="10" BorderThickness="1"
+            Background="{DynamicResource CardBackground}" BorderBrush="{DynamicResource CardBorder}"
+            BoxShadow="0 4 18 0 #48000000"
+            PointerPressed="OnPointerPressed">
+        <Grid Width="380" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto">
+            <Ellipse Margin="0,6,12,0" VerticalAlignment="Top" Classes="status"
+                     Classes.active="{Binding IsStatusActive}" Classes.waiting="{Binding IsStatusWaiting}"
+                     Classes.success="{Binding IsStatusSuccess}" Classes.error="{Binding IsStatusError}" />
+
+            <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                <TextBlock Classes="strong" Text="{Binding StatusTitle}" TextTrimming="CharacterEllipsis" />
+                <TextBlock Margin="0,2,0,0" Classes="secondary" Text="{Binding StatusDetail}" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="2" VerticalAlignment="Top" Orientation="Horizontal" Spacing="6">
+                <Button Width="36" Height="32" Padding="0" Focusable="False" Command="{Binding PauseResumeCommand}"
+                        ToolTip.Tip="{Binding PauseButtonText}" AutomationProperties.Name="{Binding PauseButtonText}"
+                        HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                    <Panel>
+                        <PathIcon Width="12" Height="12" Data="{StaticResource PauseIcon}" IsVisible="{Binding !IsPaused}" />
+                        <PathIcon Width="12" Height="12" Data="{StaticResource PlayIcon}" IsVisible="{Binding IsPaused}" />
+                    </Panel>
+                </Button>
+                <Button Width="36" Height="32" Padding="0" Focusable="False" Command="{Binding StopCommand}"
+                        ToolTip.Tip="Stop" AutomationProperties.Name="Stop"
+                        HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                    <PathIcon Width="12" Height="12" Data="{StaticResource StopIcon}" />
+                </Button>
+            </StackPanel>
+
+            <ProgressBar Grid.Row="1" Grid.ColumnSpan="3" Margin="22,12,0,0" Minimum="0" Maximum="1"
+                         Value="{Binding Progress, Mode=OneWay}" />
+
+            <TextBlock Grid.Row="2" Grid.ColumnSpan="3" Margin="22,8,0,0" FontSize="11"
+                       Foreground="{DynamicResource TertiaryText}" Text="{Binding OverlayHint}" />
+        </Grid>
+    </Border>
+</Window>

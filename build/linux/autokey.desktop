@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=AutoKey
+Comment=Types text into any window the way a person would
+Exec=autokey
+Icon=autokey
+Terminal=false
+Categories=Utility;

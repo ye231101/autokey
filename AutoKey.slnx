@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/build/">
+    <Project Path="build/DiskImage/DiskImage.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/AutoKey.Core/AutoKey.Core.csproj" />
+    <Project Path="src/AutoKey/AutoKey.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AutoKey.Core.Tests/AutoKey.Core.Tests.csproj" />
+    <Project Path="tests/AutoKey.Tests/AutoKey.Tests.csproj" />
+  </Folder>
+</Solution>

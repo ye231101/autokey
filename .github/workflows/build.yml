@@ -1,0 +1,85 @@
+name: Build
+
+# Every push: run the tests on Windows, macOS and Linux, and build the packages.
+# Pushing a version tag (for example v1.0.1) also publishes a GitHub release with all packages attached.
+on:
+  push:
+    branches: ['**']
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - name: Build
+        run: dotnet build AutoKey.slnx --configuration Release
+      - name: Test
+        run: dotnet test AutoKey.slnx --configuration Release --no-build --logger GitHubActions
+
+  package:
+    name: Package (${{ matrix.name }})
+    needs: test
+    # Each platform is packaged on its own OS: the Windows .exe only gets its icon when built on Windows, and the
+    # macOS .dmg is made with Apple's hdiutil.
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows
+            os: windows-latest
+            runtimes: win-x64
+          - name: macOS
+            os: macos-latest
+            runtimes: osx-arm64 osx-x64
+          - name: Linux
+            os: ubuntu-latest
+            runtimes: linux-x64 linux-arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - name: Build packages
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then version="${GITHUB_REF_NAME#v}"; else version="0.0.${GITHUB_RUN_NUMBER}"; fi
+          dotnet run build/package.cs -- --version "$version" ${{ matrix.runtimes }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: AutoKey-${{ matrix.name }}
+          path: artifacts/AutoKey-*
+          if-no-files-found: error
+
+  release:
+    name: Publish release
+    needs: package
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: AutoKey-*
+          path: artifacts
+          merge-multiple: true
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          sed "s/{version}/$version/g" build/release-notes.md > release-notes.md
+          gh release create "$GITHUB_REF_NAME" artifacts/AutoKey-* --title "AutoKey $version" --notes-file release-notes.md --verify-tag

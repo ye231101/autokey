@@ -1,0 +1,9 @@
+# Normalise text files; keep Unix line endings where macOS and Linux read the files directly.
+* text=auto
+*.sh text eol=lf
+*.desktop text eol=lf
+*.plist text eol=lf
+
+*.icns binary
+*.ico binary
+*.png binary
